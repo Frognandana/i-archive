@@ -497,16 +497,49 @@ header {
   margin: 14px 0;
 }
 
+/* iOS 9風：検索結果リストの仕上げ */
 #results {
-  background: #ffffff;
-}
-
-#details .detail {
-  box-shadow: none;
+  margin-top: 8px;
+  border-top: 1px solid #d6d6d6;
+  background: #fff;
 }
 
 #results .card {
-  transition: background-color 0.12s ease;
+  display: flex;
+  align-items: center;
+  min-height: 82px;
+  padding: 11px 4px;
+  margin: 0;
+  gap: 12px;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid #d6d6d6;
+  border-radius: 0;
+}
+
+#results .appicon {
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  border-radius: 13px;
+  object-fit: cover;
+}
+
+#results .appname {
+  color: #007aff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#results .dev {
+  color: #8e8e93;
+  font-size: 12px;
+}
+
+#results .arrow {
+  margin-left: auto;
+  color: #c7c7cc;
+  font-size: 25px;
 }
 
 #results .card:active {

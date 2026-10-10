@@ -799,10 +799,8 @@ function hasDownloadableCopy(version) {
 // iOSの条件を満たし、IPAのダウンロードリンクがある版を優先
 const compatibleVersions = versions.filter(v =>
   v.version &&
-  (
-    !v.minimum_os_version ||
-    compareVersions(deviceIOS, v.minimum_os_version) >= 0
-  )
+  v.minimum_os_version &&
+  compareVersions(deviceIOS, v.minimum_os_version) >= 0
 );
 
 compatibleVersions.sort((a, b) =>

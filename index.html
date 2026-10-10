@@ -752,23 +752,44 @@ try {
 }
 
 // 履歴が取得できなかった場合、別のAPIを試す
-if (versions.length === 0) {
+const hasCompatibleVersion = versions.some(v =>
+  v.version &&
+  v.minimum_os_version &&
+  compareVersions(deviceIOS, v.minimum_os_version) >= 0
+);
+
+if (versions.length === 0 || !hasCompatibleVersion) {
   const fallbackResponse = await fetch(
     `https://apis.bilin.eu.org/history/${encodeURIComponent(app.trackId)}`
   );
 
-  if (!fallbackResponse.ok) {
-    throw new Error("両方の履歴APIから取得できませんでした");
-  }
+  if (fallbackResponse.ok) {
+    const fallbackData = await fallbackResponse.json();
+    const fallbackVersions = Array.isArray(fallbackData.data)
+      ? fallbackData.data
+      : [];
 
-  const fallbackData = await fallbackResponse.json();
-  const fallbackVersions = Array.isArray(fallbackData.data)
-    ? fallbackData.data
-    : [];
+    if (fallbackVersions.length > 0) {
+      const mappedVersions = fallbackVersions.map(item => ({
+        version: item.bundle_version || "不明",
+        external_identifier: item.external_identifier || "",
+        minimum_os_version: null,
+        copies: []
+      }));
 
-  if (fallbackVersions.length === 0) {
-    throw new Error("別のAPIにもバージョン履歴がありません");
+      // Legacy Storeの履歴と統合し、重複を避ける
+      const seen = new Set(versions.map(v => v.version));
+
+      versions = [
+        ...versions,
+        ...mappedVersions.filter(v => !seen.has(v.version))
+      ];
+
+      data = { ...data, name: app.trackName, versions };
+      historySource = "Legacy Store + MuffinStore互換API";
+    }
   }
+}
 
   versions = fallbackVersions.map(item => ({
     version: item.bundle_version || "不明",
